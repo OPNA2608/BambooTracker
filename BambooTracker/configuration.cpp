@@ -469,6 +469,10 @@ Configuration::Configuration()
 			})
 		}
 	};
+
+	// Custom Layout
+	mappingCustom = {};
+	mappingCustom.insert(mappingQWERTY.begin(), mappingQWERTY.end());
 }
 
 // Internal //
