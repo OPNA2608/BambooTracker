@@ -572,7 +572,6 @@ Configuration::Configuration()
 		{u8"O",         JamKey::HIGH_D_H},
 	};
 	mappingCustom = {};
-	mappingCustom.insert(mappingQWERTY.begin(), mappingQWERTY.end());
 	mappingLayouts = {
 		{Custom, mappingCustom},
 		{QWERTY, mappingQWERTY},
