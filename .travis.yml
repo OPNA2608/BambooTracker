@@ -1,6 +1,11 @@
 language: cpp
-os: linux
-dist: xenial
+
+matrix:
+  include:
+    - os: linux
+      dist: xenial
+    - os: osx
+      osx_image: xcode10.2
 
 git:
   depth: 3
@@ -8,12 +13,14 @@ git:
 branches:
   only:
     - master
+    # for testing on local clone:
+    - travis_osx
 
+# to differenciate between the package acquisition methods
+# of Linux and macOS, we run bash script that does the logic
+# and platform-specific package installation
 before_install:
-  - sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa
-  - sudo apt update -qq
-  - sudo apt install qt5-default qttools5-dev-tools qtmultimedia5-dev libqt5multimedia5-plugins
-  - sudo apt install libasound2-dev
+  - ./.travis/beforeInstall.sh
 
 script:
   - cd BambooTracker
