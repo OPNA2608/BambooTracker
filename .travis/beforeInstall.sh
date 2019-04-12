@@ -5,7 +5,6 @@ if [ "$TRAVIS_OS_NAME" == "osx" ]; then
   # macOS: install Qt5 per brew
   brew install qt5
   brew link --force qt5
-  export PATH="$(brew --prefix)/opt/qt5/bin:$PATH"
   
 elif [ "$TRAVIS_OS_NAME" == "linux" ]; then
   
