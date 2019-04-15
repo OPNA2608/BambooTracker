@@ -18,7 +18,8 @@ addons:
       - libqt5multimedia5-plugins
       - libasound2-dev
   homebrew:
-    - qt5
+    packages:
+      - qt5
 
 git:
   depth: 3
