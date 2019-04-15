@@ -5,7 +5,20 @@ matrix:
     - os: linux
       dist: xenial
     - os: osx
-      osx_image: xcode6.4
+      osx_image: xcode7.3
+
+addons:
+  apt:
+    sources:
+      - sourceline: 'ppa:ubuntu-sdk-team/ppa'
+    packages:
+      - qt5-default
+      - qttools5-dev-tools
+      - qtmultimedia5-dev
+      - libqt5multimedia5-plugins
+      - libasound2-dev
+  homebrew:
+    - qt5
 
 git:
   depth: 3
@@ -15,12 +28,6 @@ branches:
     - master
     # for testing on local clone:
     - travis_osx
-
-# to differenciate between the package acquisition methods
-# of Linux and macOS, we run bash script that does the logic
-# and platform-specific package installation
-before_install:
-  - ./.travis/beforeInstall.sh
 
 script:
   - cd BambooTracker
