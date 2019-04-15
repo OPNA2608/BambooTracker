@@ -4,6 +4,7 @@ echo "OS: ""$TRAVIS_OS_NAME"
 if [ "$TRAVIS_OS_NAME" == "osx" ]; then
 
   set -o xtrace
+  brew search qt5
   # macOS: install Qt5 per brew
   brew install qt5
   brew link --force qt5
