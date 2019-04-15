@@ -30,6 +30,10 @@ branches:
     # for testing on local clone:
     - travis_osx
 
+before_install:
+  # osx: linking qt5 into PATH etc
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew link --force qt5; fi
+
 script:
   - cd BambooTracker
   - qmake
