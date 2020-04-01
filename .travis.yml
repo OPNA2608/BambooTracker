@@ -1,61 +1,175 @@
 language: cpp
-
-matrix:
+jobs:
   include:
-    - os: linux
-      dist: xenial
-    - os: osx
-      osx_image: xcode9.3
+  - name: Windows (7 and later)
+    os: windows
+    env:
+    - TARGET_OS=windows
+    - MAKE=mingw32-make
+    - QMAKE=qmake.exe
+    - QTDIR=~/Qt/win7
+    - QTVER=5.14.1
+    before_install:
+    # We *need* to manually install 32-Bit MinGW
+    - choco uninstall -y mingw
+    - choco install -q mingw --version=7.3.0 -x86 -params "/exception:dwarf"
+    - export MINGWPATH="/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw32/bin"
+    - echo "$MINGWPATH"
+    - find "$MINGWPATH" -type f
+    # Neither Travis CI nor Chocolatey have a Qt package, so we fetch it from upstream.
+    - echo "Installing Qt"
+    - wget https://code.qt.io/cgit/qbs/qbs.git/plain/scripts/install-qt.sh
+    - bash install-qt.sh -d "$QTDIR" --version "$QTVER" --toolchain win32_mingw73
+      qtbase qtmultimedia qttools
+    - export QTPATH="$(echo "$QTDIR"/"$QTVER"/*/bin)"
+    - echo "$QTPATH"
+    - find "$QTPATH" -type f
+    - export PATH="$MINGWPATH":"$QTPATH":"$PATH"
+    - echo "$PATH"
+    before_deploy:
+    - cd ..
+    - mkdir bin
+    - cp -rt bin "$(find . -name BambooTracker.exe)" *.md img demos licenses specs skins
+    - cd bin
+    - windeployqt BambooTracker.exe -verbose=2
+    - mv translations lang
+    - mv ../BambooTracker/.qm/*.qm lang/
+    - 7z a -tzip ../BambooTracker-"$TRAVIS_TAG"-"$TARGET_OS".zip *
+  - name: Windows (XP)
+    os: windows
+    env:
+    - TARGET_OS=windows-xp
+    - MAKE=mingw32-make
+    - QMAKE=qmake.exe
+    - QTDIR=~/Qt/winXP
+    - QTVER=5.5
+    before_install:
+    # We *need* to manually install 32-Bit MinGW
+    - choco uninstall -y mingw
+    - choco install -q mingw --version=4.9.3 -x86 -params "/exception:dwarf"
+    - export MINGWPATH="/c/tools/mingw32/bin"
+    - echo "$MINGWPATH"
+    - find "$MINGWPATH" -type f
+    # Neither Travis CI nor Chocolatey have a Qt package, so we fetch it from upstream.
+    - echo "Installing Qt"
+    - wget https://code.qt.io/cgit/qbs/qbs.git/plain/scripts/install-qt.sh
+    - bash install-qt.sh -d "$QTDIR" --version "$QTVER" --toolchain win32_mingw492
+      essentials addons
+    - export QTPATH="$(echo "$QTDIR"/"$QTVER"/*/bin)"
+    # Fix Qt configuration by hand, due to non-qtbase name in older versions
+    - echo "[Paths]" > "$QTPATH"/qt.conf
+    - echo "Prefix = .." >> "$QTPATH"/qt.conf
+    - export PRI_FILE="$QTPATH"/../mkspecs/qconfig.pri
+    - sed -i.bak 's/Enterprise/OpenSource/g' "${PRI_FILE}"
+    - sed -i.bak 's/licheck.*//g' "${PRI_FILE}"
+    - rm "${PRI_FILE}.bak"
+    - echo "$QTPATH"
+    - find "$QTPATH" -type f
+    - export PATH="$MINGWPATH":"$QTPATH":"$PATH"
+    - echo "$PATH"
+    before_deploy:
+    - cd ..
+    - mkdir bin
+    - cp -rt bin "$(find . -name BambooTracker.exe)" *.md img demos licenses specs skins
+    - cd bin
+    - windeployqt BambooTracker.exe -verbose=2
+    - mv translations lang
+    - mv ../BambooTracker/.qm/*.qm lang
+    - 7z a -tzip ../BambooTracker-"$TRAVIS_TAG"-"$TARGET_OS".zip *
+
+  - name: macOS (Xcode 11.3)
+    os: osx
+    osx_image: xcode11.3
+    env:
+    - TARGET_OS=macos
+    - MAKE=make
+    - QMAKE="qmake DEFINES+=__UNIX_JACK__"
+    before_install:
+    # force linking of qt into PATH
+    - brew link --force qt
+    # Append jack include to make
+    - export JACKLIB=$(find /usr/local/Cellar/jack/ -type d -name lib)
+    - export JACKINC=$(find /usr/local/Cellar/jack/ -type d -name include)
+    - export QMAKE="$QMAKE LIBS+=-L$JACKLIB INCLUDEPATH+=$JACKINC"
+    - echo "$QMAKE"
+    before_deploy:
+    - macdeployqt BambooTracker.app -verbose=2
+    - mv .qm lang
+    - mv lang BambooTracker.app/Contents/Resources
+    - mv BambooTracker.app ..
+    - cd ..
+    - zip -r BambooTracker-$TRAVIS_TAG-$TARGET_OS.zip BambooTracker.app *.md img demos licenses specs skins
+  - name: macOS (Xcode 9.3)
+    os: osx
+    osx_image: xcode9.3
+    env:
+    - TARGET_OS=macos-legacy
+    - MAKE=make
+    - QMAKE="qmake DEFINES+=__UNIX_JACK__"
+    before_install:
+    # Force linking of Qt into PATH
+    - brew link --force qt
+    # Append jack includes to make
+    - export JACKLIB=$(find /usr/local/Cellar/jack/ -type d -name lib)
+    - export JACKINC=$(find /usr/local/Cellar/jack/ -type d -name include)
+    - export QMAKE="$QMAKE LIBS+=-L$JACKLIB INCLUDEPATH+=$JACKINC"
+    - echo "$QMAKE"
+    before_deploy:
+    - macdeployqt BambooTracker.app -verbose=2
+    - mv .qm lang
+    - mv lang BambooTracker.app/Contents/Resources
+    - mv BambooTracker.app ..
+    - cd ..
+    - zip -r BambooTracker-$TRAVIS_TAG-$TARGET_OS.zip BambooTracker.app *.md img demos licenses specs skins LICENSE
+
+  - name: Linux (Ubuntu 16.04)
+    os: linux
+    dist: xenial
+    env:
+    - TARGET_OS=linux
+    - MAKE=make
+    - QMAKE="qmake DEFINES+=__LINUX_PULSE__ DEFINES+=__UNIX_JACK__"
+    # no deployment phase, manual build is preferred on Linux
+    # TODO consider Appimage?
 
 addons:
-  apt:
-    sources:
-      - sourceline: 'ppa:ubuntu-sdk-team/ppa'
-    packages:
-      - qt5-default
-      - qttools5-dev-tools
-      - qtmultimedia5-dev
-      - libqt5multimedia5-plugins
-      - libasound2-dev
-      - libjack-dev
-      - libpulse-dev
   homebrew:
     packages:
-      - qt
+    - jack
+    - qt
     update: true
+  apt:
+    sources:
+    - sourceline: ppa:ubuntu-sdk-team/ppa
+    packages:
+    - qt5-default
+    - qttools5-dev-tools
+    - qtmultimedia5-dev
+    - libqt5multimedia5-plugins
+    - libasound2-dev
+    - libpulse-dev
+    - libjack-dev
 
 git:
   depth: 3
 
 branches:
   only:
-    - master
-    - "/^v[0-9\\.]+$/"
-
-before_install:
-  # osx: force linking of qt into PATH
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew link --force qt; fi
+  - master
+  - "/^v[0-9\\.]+$/"
 
 script:
-  - cd BambooTracker
-  - qmake
-  - make
-
-before_deploy:
-  - macdeployqt BambooTracker.app -verbose=2
-  - mv .qm lang
-  - mv lang BambooTracker.app/Contents/Resources
-  - mv BambooTracker.app ..
-  - cd ..
-  - zip -r BambooTracker-$TRAVIS_TAG-macOS.zip BambooTracker.app *.md img demos licenses specs skins LICENSE
+- cd BambooTracker
+- "$QMAKE CONFIG+=release CONFIG-=debug"
+- "$MAKE -j2"
 
 deploy:
   provider: releases
   api_key:
-    secure: cZtUOLRT6zHXsmcyZvhQzZVEjG4vJ0j3FYYu+/HAgRdZ8Rf+8hpNuELMcabMlxd4/7AOkjGDo6gqIOt0VlwtqgWtzlJwvUbMXIgNyw2bjIETUsh6rrGBtZNm9r5my7Iv4xtFw9SBCOdyykKo/kVUpomdPwPm1VwhCjgKW9eNzKW49tcmG2BHZiL2ZBibxAqGJmSEG0RkYa6Ycxbx4qFSJ6hb40MiCrtAyyyFnzdpHEdBsgpbXO/wBeQDRYaf88lC+tuh2uz81m8wNkLBFU6fIA7XgKcChy2C1tMdsMhSILSx6Zgthfb3l/EsGcbwx8dj+uWJybPc3kWHly17bdS3hjNG8N/IpNHSetmk6tPXNxiGVFxFiCjEPJohMuSksx5MFrdJgUkOUhT9Vr2ZPXOoXTjhnXAasJAgGklMlcxni+H2hCSAzIokFMOGwxRObCmXjsD9U2TvujAblYf2VU2cimoxkERlZdAwt9QZkWJ6xSW2sD8DaxQ9hcJcovXIEC9QEfqSA0klkz1GQHgJ/lMvyZPYJPzq7KkbQiwIk3yYtvlpigoWgvOslCh9hgTgXVqvHF2rcOQTgYt1q6IRIu4NwSqqhBj2BcJdM+wfNsjoiJ2+0+O6Tdc9SPSnfi9b4+i6k32FeCcNICuE+eXU2GYCosviBAC6KpfSH6Fw467ygds=
-  file: $TRAVIS_BUILD_DIR/BambooTracker-$TRAVIS_TAG-macOS.zip
+    secure: "NXKmuVsiua4LP3t3vV0sk4rozJMIyrbF7fJmf3XygKfoSqaAI5fuSIYlANwH30Q7u2F/+qyROi2jJVl9AvFmGpYar2yd4fVjM/4e0ax7lswqMzCIkFEZ6IkQyAyC7mZRfbxkH7Wd1ECNFtInvJcL+nB9Odxf3JovpNzBHutiJkoPCD4cv3qRuUOASyHxZBFxk+MSkX7jZunKFBfi2icYVX3PcIZZQMWY4a1gPYBIS7GwaK0t15zbFh1vZkuHMch8hJr5DsD4PR8y9XyaFxDYXRDNeDvYYUYJE5NxelBYBFf+AOSKKjHQyRze418O5yFsDjW7iH2SJw3VUx6UfbH/ohwoMQxBhYmpO4i5/Q1yyeA+70iWsOXALhEHYzRK6yOW2toNSsBKXCGFgwD+pmhZLqktXPS1368pFKMcIZHGJQ5ZmOfZXT81MH079ntwo2MXUZwWIDCgKK8nLiaWAEQBBzkIvGvokjaPzz+jk+ID02u8Y7bSO2j6OUC+UnumHLZrPnermoRzvBEIP/fCJ3d/rX4VBSs9iZWgsNwuWuQGeb+EECZUbbHtxEtM4C1Io1bh0f4/1WJzrjkYBWfsc/W4tUggX3I3yOdQ69qGe7A1XjqXWh5eHtKXvjR8PtpkwTJMnXWNe0VuMNJGu3cvL66PMXVfi3Y5UaP5I1uWiSh7Oj8="
   skip_cleanup: true
+  file: "$TRAVIS_BUILD_DIR/BambooTracker-$TRAVIS_TAG-$TARGET_OS.zip"
   on:
-    repo: rerrahkr/BambooTracker
+    repo: OPNA2608/BambooTracker
     tags: true
-    condition: $TRAVIS_OS_NAME = osx
+    condition: $TRAVIS_OS_NAME != linux
