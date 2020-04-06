@@ -5,6 +5,6 @@ set -e
 
 cp -a "$(find ../ -name BambooTracker.app)" ../{img,demos,licenses,specs,skins,*.md} .
 macdeployqt BambooTracker.app -verbose=2
-mv ../.qm/ BambooTracker.app/Contents/Resources/lang
+mv ../BambooTracker/.qm/ BambooTracker.app/Contents/Resources/lang
 
 exit 0
