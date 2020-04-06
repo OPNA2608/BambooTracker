@@ -1,0 +1,53 @@
+name: macOS (Modern)
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  BUILD_TARGET: macos
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - name:  Checking out repo.
+      uses:  actions/checkout@v2
+
+    - name:  Installing dependencies.
+      run:   |
+        brew install qt
+        brew install jack
+        brew install p7zip
+
+    - name:  Configuring.
+      run:   |
+        export PATH="/usr/local/opt/qt/bin:$PATH"
+        JACKLIB==/usr/local/opt/jack/lib
+        JACKINC=/usr/local/opt/jack/include
+        cd BambooTracker
+        qmake BambooTracker.pro CONFIG+=debug CONFIG+=console CONFIG+=nostrip LIBS+=-L$JACKLIB INCLUDEPATH+=$JACKINC
+
+    - name:  Building.
+      run:   |
+        export PATH="/usr/local/opt/qt/bin:$PATH"
+        cd BambooTracker
+        make -j2
+
+    - name:  Packaging.
+      run:   |
+        export PATH="/usr/local/opt/qt/bin:$PATH"
+        mkdir packaging
+        cd packaging
+        ../ci/package_osx.sh
+
+
+    - name:  Uploading artifact
+      uses:  actions/upload-artifact@v1
+      with:
+        name: BambooTracker-debug-${{ env.BUILD_TARGET }}-master
+        path: packaging
+

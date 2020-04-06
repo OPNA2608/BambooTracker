@@ -22,8 +22,8 @@ if [[ -d "$QT_TARGETDIR"/"$QT_TARGETVER" ]]; then
   echo "If cache is incorrect, please delete the cache and restart the build."
   exit 0
 else
-  wget https://code.qt.io/cgit/qbs/qbs.git/plain/scripts/install-qt.sh -O install-qt.sh
-  bash install-qt.sh -d "$QT_TARGETDIR" --host "windows_x86" --version "$QT_TARGETVER" --toolchain "$QT_TARGETTCH" $QT_TARGETCMP
+  curl https://code.qt.io/cgit/qbs/qbs.git/plain/scripts/install-qt.sh > install-qt.sh
+  bash ./install-qt.sh -d "$QT_TARGETDIR" --host "windows_x86" --version "$QT_TARGETVER" --toolchain "$QT_TARGETTCH" $QT_TARGETCMP
   echo "Qt fetched."
   if [[ "$(echo "$QT_TARGETCMP" | grep essentials 2>&1 >/dev/null; echo $?)" -eq 0 ]]; then
     echo "Older Qt version detected, manually patching setup."
