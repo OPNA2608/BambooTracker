@@ -13,7 +13,7 @@ jobs:
     - QTVER=5.14.1
     - QTTCH=win32_mingw73
     before_install:
-    # We *need* to manually install 32-Bit MinGW
+    # We need to manually install 32-Bit MinGW
     - bash "$TRAVIS_BUILD_DIR"/ci/fetch_mingw.sh "$MINGWVER"
     - MINGWPATH="/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw32"
     # Neither Travis CI nor Chocolatey have a Qt package, so we fetch it from upstream.
@@ -32,7 +32,7 @@ jobs:
     - QTVER=5.5
     - QTTCH=win32_mingw492
     before_install:
-    # We *need* to manually install 32-Bit MinGW
+    # We need to manually install 32-Bit MinGW
     - bash "$TRAVIS_BUILD_DIR"/ci/fetch_mingw.sh "$MINGWVER"
     - MINGWPATH="/c/tools/mingw32"
     # Neither Travis CI nor Chocolatey have a Qt package, so we fetch it from upstream.
@@ -127,11 +127,11 @@ before_deploy:
 
 deploy:
   provider: releases
-  api_key:
-    secure: "NXKmuVsiua4LP3t3vV0sk4rozJMIyrbF7fJmf3XygKfoSqaAI5fuSIYlANwH30Q7u2F/+qyROi2jJVl9AvFmGpYar2yd4fVjM/4e0ax7lswqMzCIkFEZ6IkQyAyC7mZRfbxkH7Wd1ECNFtInvJcL+nB9Odxf3JovpNzBHutiJkoPCD4cv3qRuUOASyHxZBFxk+MSkX7jZunKFBfi2icYVX3PcIZZQMWY4a1gPYBIS7GwaK0t15zbFh1vZkuHMch8hJr5DsD4PR8y9XyaFxDYXRDNeDvYYUYJE5NxelBYBFf+AOSKKjHQyRze418O5yFsDjW7iH2SJw3VUx6UfbH/ohwoMQxBhYmpO4i5/Q1yyeA+70iWsOXALhEHYzRK6yOW2toNSsBKXCGFgwD+pmhZLqktXPS1368pFKMcIZHGJQ5ZmOfZXT81MH079ntwo2MXUZwWIDCgKK8nLiaWAEQBBzkIvGvokjaPzz+jk+ID02u8Y7bSO2j6OUC+UnumHLZrPnermoRzvBEIP/fCJ3d/rX4VBSs9iZWgsNwuWuQGeb+EECZUbbHtxEtM4C1Io1bh0f4/1WJzrjkYBWfsc/W4tUggX3I3yOdQ69qGe7A1XjqXWh5eHtKXvjR8PtpkwTJMnXWNe0VuMNJGu3cvL66PMXVfi3Y5UaP5I1uWiSh7Oj8="
+  token:
+    secure: "bs+nLxg+IeepN/gyUHN//I1pPvKDMXiAGF7aE8vOW7c6ZeJMoUIGydJkNzsPWIKnRhMa5RYlOXM+9/eMzYe0JAC2cVj/Zo2IMeRVYqeQDrKZ1my6CMGGvE0dUnSHXIezN0+Z4SP+p6HRRF20FLqthz/3ICWiqoSo1/HFHnj5nDCG2Ni++Xt5PFVBOa6sp9CzDBtm9I8xBwoieZFwUpU/BMOqlHHHoQ09YSdzCdu0E544bAh7RXgmyl+ayYD8klVhf5p82oynnMliAdj0IOlPRETyBhhdXXv5/Eivtoo9e5bvlbEwuuy8yvbZl9LW0fQLobB2o/2eYNtDpxOciLOZQaj8EvjhOPVeyAlEKi28VOusYFVrGk3UEuN5HoxMPdwWRJWylgcsYd1ZWS907ccj9XLrF4bVpyPOhvYiLA1zgIU+nk5B7NWqzQjcNEQK4jx+UeJURLpZMS8F1lyLlNJeWr3b5E0+6+nTmgeq5E7jGwdhUraje6W5hmXlwrKvoJ8kFnKDyRKuNCvtnoBX7XvJl7iYmp4FvQfgSWFOkIIvWdGPbByMff6vYrXU3WvkGPLErZuM9ivj7HCwx55xiBimKZCiUgrTPrbgN4KJfcnA9YbgumoF9K4xdvQmBLxV5S/LIm7pUJS5+PSyZM+PNfsbuapYPQWfdTH5/ZGetdUNgV0="
   skip_cleanup: true
   file: $TRAVIS_BUILD_DIR/BambooTracker-$TRAVIS_TAG-$TARGET_OS.zip
   on:
-    repo: OPNA2608/BambooTracker
+    repo: rerrahkr/BambooTracker
     tags: true
     condition: $TRAVIS_OS_NAME != linux
