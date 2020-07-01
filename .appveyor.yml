@@ -10,6 +10,7 @@ branches:
   # whitelist
   only:
     - master
+    - debug_rtapicore_sigsegv
 
 # Do not build on tags
 skip_tags: true

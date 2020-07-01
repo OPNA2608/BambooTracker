@@ -701,7 +701,6 @@ RtAudio::DeviceInfo RtApiCore :: getDeviceInfo( unsigned int device )
   }
 
   AudioDeviceID id = deviceList[ device ];
-  delete[] deviceList;
 
   // Get the device name.
   info.name.erase();
@@ -713,6 +712,7 @@ RtAudio::DeviceInfo RtApiCore :: getDeviceInfo( unsigned int device )
     errorStream_ << "RtApiCore::probeDeviceInfo: system error (" << getErrorCode( result ) << ") getting device manufacturer.";
     errorText_ = errorStream_.str();
     error( RtAudioError::WARNING );
+    delete[] deviceList;
     return info;
   }
 
@@ -735,6 +735,7 @@ RtAudio::DeviceInfo RtApiCore :: getDeviceInfo( unsigned int device )
     errorStream_ << "RtApiCore::probeDeviceInfo: system error (" << getErrorCode( result ) << ") getting device name.";
     errorText_ = errorStream_.str();
     error( RtAudioError::WARNING );
+    delete[] deviceList;
     return info;
   }
 
@@ -761,6 +762,7 @@ RtAudio::DeviceInfo RtApiCore :: getDeviceInfo( unsigned int device )
     errorStream_ << "RtApiCore::getDeviceInfo: system error (" << getErrorCode( result ) << ") getting output stream configuration info for device (" << device << ").";
     errorText_ = errorStream_.str();
     error( RtAudioError::WARNING );
+    delete[] deviceList;
     return info;
   }
 
@@ -769,6 +771,7 @@ RtAudio::DeviceInfo RtApiCore :: getDeviceInfo( unsigned int device )
   if ( bufferList == NULL ) {
     errorText_ = "RtApiCore::getDeviceInfo: memory error allocating output AudioBufferList.";
     error( RtAudioError::WARNING );
+    delete[] deviceList;
     return info;
   }
 
@@ -778,6 +781,7 @@ RtAudio::DeviceInfo RtApiCore :: getDeviceInfo( unsigned int device )
     errorStream_ << "RtApiCore::getDeviceInfo: system error (" << getErrorCode( result ) << ") getting output stream configuration for device (" << device << ").";
     errorText_ = errorStream_.str();
     error( RtAudioError::WARNING );
+    delete[] deviceList;
     return info;
   }
 
@@ -794,6 +798,7 @@ RtAudio::DeviceInfo RtApiCore :: getDeviceInfo( unsigned int device )
     errorStream_ << "RtApiCore::getDeviceInfo: system error (" << getErrorCode( result ) << ") getting input stream configuration info for device (" << device << ").";
     errorText_ = errorStream_.str();
     error( RtAudioError::WARNING );
+    delete[] deviceList;
     return info;
   }
 
@@ -802,6 +807,7 @@ RtAudio::DeviceInfo RtApiCore :: getDeviceInfo( unsigned int device )
   if ( bufferList == NULL ) {
     errorText_ = "RtApiCore::getDeviceInfo: memory error allocating input AudioBufferList.";
     error( RtAudioError::WARNING );
+    delete[] deviceList;
     return info;
   }
 
@@ -811,6 +817,7 @@ RtAudio::DeviceInfo RtApiCore :: getDeviceInfo( unsigned int device )
     errorStream_ << "RtApiCore::getDeviceInfo: system error (" << getErrorCode( result ) << ") getting input stream configuration for device (" << device << ").";
     errorText_ = errorStream_.str();
     error( RtAudioError::WARNING );
+    delete[] deviceList;
     return info;
   }
 
@@ -836,6 +843,7 @@ RtAudio::DeviceInfo RtApiCore :: getDeviceInfo( unsigned int device )
     errorStream_ << "RtApiCore::getDeviceInfo: system error (" << getErrorCode( result ) << ") getting sample rate info.";
     errorText_ = errorStream_.str();
     error( RtAudioError::WARNING );
+    delete[] deviceList;
     return info;
   }
 
@@ -847,6 +855,7 @@ RtAudio::DeviceInfo RtApiCore :: getDeviceInfo( unsigned int device )
     errorText_ = errorStream_.str();
     error( RtAudioError::WARNING );
     delete[] rangeList;
+    delete[] deviceList;
     return info;
   }
 
@@ -874,7 +883,6 @@ RtAudio::DeviceInfo RtApiCore :: getDeviceInfo( unsigned int device )
       if ( rangeList[i].mMaximum < maximumRate ) maximumRate = rangeList[i].mMaximum;
     }
   }
-  delete[] rangeList;
 
   if ( haveValueRange ) {
     for ( unsigned int k=0; k<MAX_SAMPLE_RATES; k++ ) {
@@ -895,6 +903,8 @@ RtAudio::DeviceInfo RtApiCore :: getDeviceInfo( unsigned int device )
     errorStream_ << "RtApiCore::probeDeviceInfo: No supported sample rates found for device (" << device << ").";
     errorText_ = errorStream_.str();
     error( RtAudioError::WARNING );
+    delete[] rangeList;
+    delete[] deviceList;
     return info;
   }
 
@@ -909,6 +919,8 @@ RtAudio::DeviceInfo RtApiCore :: getDeviceInfo( unsigned int device )
     if ( getDefaultInputDevice() == device ) info.isDefaultInput = true;
 
   info.probed = true;
+  delete[] rangeList;
+  delete[] deviceList;
   return info;
 }
 
@@ -993,7 +1005,6 @@ bool RtApiCore :: probeDeviceOpen( unsigned int device, StreamMode mode, unsigne
   }
 
   AudioDeviceID id = deviceList[ device ];
-  delete[] deviceList;
 
   // Setup for stream mode.
   bool isInput = false;
@@ -1012,6 +1023,7 @@ bool RtApiCore :: probeDeviceOpen( unsigned int device, StreamMode mode, unsigne
   if ( result != noErr || dataSize == 0 ) {
     errorStream_ << "RtApiCore::probeDeviceOpen: system error (" << getErrorCode( result ) << ") getting stream configuration info for device (" << device << ").";
     errorText_ = errorStream_.str();
+    delete[] deviceList;
     return FAILURE;
   }
 
@@ -1019,6 +1031,7 @@ bool RtApiCore :: probeDeviceOpen( unsigned int device, StreamMode mode, unsigne
   bufferList = (AudioBufferList *) malloc( dataSize );
   if ( bufferList == NULL ) {
     errorText_ = "RtApiCore::probeDeviceOpen: memory error allocating AudioBufferList.";
+    delete[] deviceList;
     return FAILURE;
   }
 
@@ -1027,6 +1040,7 @@ bool RtApiCore :: probeDeviceOpen( unsigned int device, StreamMode mode, unsigne
     free( bufferList );
     errorStream_ << "RtApiCore::probeDeviceOpen: system error (" << getErrorCode( result ) << ") getting stream configuration for device (" << device << ").";
     errorText_ = errorStream_.str();
+    delete[] deviceList;
     return FAILURE;
   }
 
@@ -1053,6 +1067,7 @@ bool RtApiCore :: probeDeviceOpen( unsigned int device, StreamMode mode, unsigne
     free( bufferList );
     errorStream_ << "RtApiCore::probeDeviceOpen: the device (" << device << ") does not support the requested channel count.";
     errorText_ = errorStream_.str();
+    delete[] deviceList;
     return FAILURE;
   }
 
@@ -1105,6 +1120,7 @@ bool RtApiCore :: probeDeviceOpen( unsigned int device, StreamMode mode, unsigne
   if ( result != noErr ) {
     errorStream_ << "RtApiCore::probeDeviceOpen: system error (" << getErrorCode( result ) << ") getting buffer size range for device (" << device << ").";
     errorText_ = errorStream_.str();
+    delete[] deviceList;
     return FAILURE;
   }
 
@@ -1122,6 +1138,7 @@ bool RtApiCore :: probeDeviceOpen( unsigned int device, StreamMode mode, unsigne
   if ( result != noErr ) {
     errorStream_ << "RtApiCore::probeDeviceOpen: system error (" << getErrorCode( result ) << ") setting the buffer size for device (" << device << ").";
     errorText_ = errorStream_.str();
+    delete[] deviceList;
     return FAILURE;
   }
 
@@ -1131,6 +1148,7 @@ bool RtApiCore :: probeDeviceOpen( unsigned int device, StreamMode mode, unsigne
   if ( stream_.mode == OUTPUT && mode == INPUT && *bufferSize != stream_.bufferSize ) {
     errorStream_ << "RtApiCore::probeDeviceOpen: system error setting buffer size for duplex stream on device (" << device << ").";
     errorText_ = errorStream_.str();
+    delete[] deviceList;
     return FAILURE;
   }
 
@@ -1146,6 +1164,7 @@ bool RtApiCore :: probeDeviceOpen( unsigned int device, StreamMode mode, unsigne
     if ( result != noErr ) {
       errorStream_ << "RtApiCore::probeDeviceOpen: system error (" << getErrorCode( result ) << ") getting 'hog' state!";
       errorText_ = errorStream_.str();
+      delete[] deviceList;
       return FAILURE;
     }
 
@@ -1155,6 +1174,7 @@ bool RtApiCore :: probeDeviceOpen( unsigned int device, StreamMode mode, unsigne
       if ( result != noErr ) {
         errorStream_ << "RtApiCore::probeDeviceOpen: system error (" << getErrorCode( result ) << ") setting 'hog' state!";
         errorText_ = errorStream_.str();
+        delete[] deviceList;
         return FAILURE;
       }
     }
@@ -1168,6 +1188,7 @@ bool RtApiCore :: probeDeviceOpen( unsigned int device, StreamMode mode, unsigne
   if ( result != noErr ) {
     errorStream_ << "RtApiCore::probeDeviceOpen: system error (" << getErrorCode( result ) << ") getting current sample rate.";
     errorText_ = errorStream_.str();
+    delete[] deviceList;
     return FAILURE;
   }
 
@@ -1181,6 +1202,7 @@ bool RtApiCore :: probeDeviceOpen( unsigned int device, StreamMode mode, unsigne
     if ( result != noErr ) {
       errorStream_ << "RtApiCore::probeDeviceOpen: system error (" << getErrorCode( result ) << ") setting sample rate property listener for device (" << device << ").";
       errorText_ = errorStream_.str();
+      delete[] deviceList;
       return FAILURE;
     }
 
@@ -1190,6 +1212,7 @@ bool RtApiCore :: probeDeviceOpen( unsigned int device, StreamMode mode, unsigne
       AudioObjectRemovePropertyListener( id, &tmp, rateListener, (void *) &reportedRate );
       errorStream_ << "RtApiCore::probeDeviceOpen: system error (" << getErrorCode( result ) << ") setting sample rate for device (" << device << ").";
       errorText_ = errorStream_.str();
+      delete[] deviceList;
       return FAILURE;
     }
 
@@ -1207,6 +1230,7 @@ bool RtApiCore :: probeDeviceOpen( unsigned int device, StreamMode mode, unsigne
     if ( microCounter > 5000000 ) {
       errorStream_ << "RtApiCore::probeDeviceOpen: timeout waiting for sample rate update for device (" << device << ").";
       errorText_ = errorStream_.str();
+      delete[] deviceList;
       return FAILURE;
     }
   }
@@ -1220,6 +1244,7 @@ bool RtApiCore :: probeDeviceOpen( unsigned int device, StreamMode mode, unsigne
   if ( result != noErr ) {
     errorStream_ << "RtApiCore::probeDeviceOpen: system error (" << getErrorCode( result ) << ") getting stream format for device (" << device << ").";
     errorText_ = errorStream_.str();
+    delete[] deviceList;
     return FAILURE;
   }
 
@@ -1242,6 +1267,7 @@ bool RtApiCore :: probeDeviceOpen( unsigned int device, StreamMode mode, unsigne
     if ( result != noErr ) {
       errorStream_ << "RtApiCore::probeDeviceOpen: system error (" << getErrorCode( result ) << ") setting sample rate or data format for device (" << device << ").";
       errorText_ = errorStream_.str();
+      delete[] deviceList;
       return FAILURE;
     }
   }
@@ -1252,6 +1278,7 @@ bool RtApiCore :: probeDeviceOpen( unsigned int device, StreamMode mode, unsigne
   if ( result != noErr ) {
     errorStream_ << "RtApiCore::probeDeviceOpen: system error (" << getErrorCode( result ) << ") getting stream physical format for device (" << device << ").";
     errorText_ = errorStream_.str();
+    delete[] deviceList;
     return FAILURE;
   }
 
@@ -1307,6 +1334,7 @@ bool RtApiCore :: probeDeviceOpen( unsigned int device, StreamMode mode, unsigne
     if ( !setPhysicalFormat ) {
       errorStream_ << "RtApiCore::probeDeviceOpen: system error (" << getErrorCode( result ) << ") setting physical data format for device (" << device << ").";
       errorText_ = errorStream_.str();
+      delete[] deviceList;
       return FAILURE;
     }
   } // done setting virtual/physical formats.
@@ -1456,6 +1484,7 @@ bool RtApiCore :: probeDeviceOpen( unsigned int device, StreamMode mode, unsigne
   property.mScope = kAudioObjectPropertyScopeGlobal;
   result = AudioObjectAddPropertyListener( id, &property, xrunListener, (void *) handle );
 
+  delete[] deviceList;
   return SUCCESS;
 
  error:
@@ -1478,6 +1507,7 @@ bool RtApiCore :: probeDeviceOpen( unsigned int device, StreamMode mode, unsigne
   }
 
   stream_.state = STREAM_CLOSED;
+  delete[] deviceList;
   return FAILURE;
 }
 
