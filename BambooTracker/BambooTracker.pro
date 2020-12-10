@@ -7,6 +7,7 @@
 QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+equals(QT_MAJOR_VERSION, 6): QT += core5compat
 
 TARGET = BambooTracker
 TEMPLATE = app
@@ -115,6 +116,10 @@ else:clang|if(gcc:!intel_icc) {
     greaterThan(COMPILER_MAJOR_VERSION, 8) {
       CPP_WARNING_FLAGS += -Wno-error=deprecated-copy
     }
+  }
+
+  versionAtLeast(QT_VERSION, 6.0.0) {
+    CPP_WARNING_FLAGS += -Wno-error=deprecated-declarations -Wno-error=unused-result
   }
 }
 else {

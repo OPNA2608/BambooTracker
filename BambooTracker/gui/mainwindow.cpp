@@ -40,7 +40,6 @@
 #include <QMimeData>
 #include <QProgressDialog>
 #include <QRect>
-#include <QDesktopWidget>
 #include <QMetaMethod>
 #include <QScreen>
 #include <QComboBox>
