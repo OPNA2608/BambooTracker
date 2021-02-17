@@ -11,6 +11,7 @@ branches:
   only:
     - master
     - /v\d*\.\d*\.\d*/
+    - nuked-opna-hack_noisefix
 
 # Skipping commits with particular message or from specific user
 skip_commits:
