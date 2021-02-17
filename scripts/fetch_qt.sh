@@ -16,8 +16,8 @@ shift 3
 
 QT6_QT5COMPAT=
 QT_TARGETCMP=
-while [ $# -gt 0 ]; do
-  if [ "$1" = "qt5compat" ]; then
+while [[ $# -gt 0 ]]; do
+  if [[ "$1" = "qt5compat" ]]; then
     QT6_QT5COMPAT=yes
   else
     QT_TARGETCMP="${QT_TARGETCMP}"${QT_TARGETCMP:+' '}"$1"

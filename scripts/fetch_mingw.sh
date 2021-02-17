@@ -13,7 +13,7 @@ MINGW_TARGETVER="$2"
 MINGW_TARGETBIT="$3"
 MINGW_TARGETNEWDIR="$4"
 
-if [ ${MINGW_TARGETBIT} -ne 32 && ${MINGW_TARGETBIT} -ne 64 ]; then
+if [[ ${MINGW_TARGETBIT} -ne 32 && ${MINGW_TARGETBIT} -ne 64 ]]; then
   echo "Invalid bitness! Must be '32' or '64', was '${MINGW_TARGETBIT}'!" >&2
   exit 1
 fi
@@ -21,6 +21,7 @@ fi
 echo "Test if fetching MinGW ${MINGW_TARGETVER} is required..."
 
 if [[
+  x${MINGW_TARGETNEWDIR} == x &&
   -d ${MINGW_TARGETDIR}/bin &&
   -f ${MINGW_TARGETDIR}/bin/g++ &&
   $(${MINGW_TARGETDIR}/bin/g++ -dumpversion) == ${MINGW_TARGETVER}
@@ -34,13 +35,13 @@ if [[
   echo "If this is incorrect, please invalidate the cache and restart the build."
   exit 0
 else
-  echo "Fetching ${MINGW_TARGETBIT-bit} MinGW ${MINGW_TARGETVER}."
+  echo "Fetching ${MINGW_TARGETBIT}-bit MinGW ${MINGW_TARGETVER}."
   MINGW_TARGETARGS=
-  if [ ${MINGW_TARGETBIT} -eq 32 ]; then
+  if [[ ${MINGW_TARGETBIT} -eq 32 ]]; then
     MINGW_TARGETARGS='-x86 -params "/exception:dwarf"'
   fi
   choco install -q mingw --version=${MINGW_TARGETVER} ${MINGW_TARGETARGS} --force
-  if [ x${MINGW_TARGETNEWDIR} != x ]; then
+  if [[ x${MINGW_TARGETNEWDIR} != x ]]; then
     echo "Cache-helper enabled."
     echo "Copying ${MINGW_TARGETBIT}-bit MinGW ${MINGW_TARGETVER} from"
     echo "'${MINGW_TARGETDIR}' to"
@@ -51,7 +52,7 @@ else
     chown -R $(whoami) ${MINGW_TARGETNEWDIR}
     chmod -R 755 ${MINGW_TARGETNEWDIR}
   fi
-  echo "x86 MinGW ${MINGW_TARGETVER} is fetched."
+  echo "${MINGW_TARGETBIT}-bit MinGW ${MINGW_TARGETVER} is fetched."
   exit 0
 fi
 

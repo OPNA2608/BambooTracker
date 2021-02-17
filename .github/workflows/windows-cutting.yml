@@ -27,7 +27,7 @@ defaults:
 
 env:
   BUILD_TARGET: windows
-  MAKE: mingw64-make
+  MAKE: mingw32-make
   BT_INSTALLBASE: ${{ github.workspace }}/target/
   MINGW_VERSION: 8.1.0
   MINGW_BITNESS: 64
