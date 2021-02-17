@@ -2,7 +2,9 @@ name: Windows (10, 64-bit, Qt6)
 
 on:
   push:
-    branches: master
+    branches:
+      - master
+      - qt6_porting
     tags: 'v*.*.*'
     paths-ignore:
       - '**.md'
@@ -10,7 +12,9 @@ on:
       - 'LICENSE'
       - '.gitignore'
   pull_request:
-    branches: master
+    branches:
+      - master
+      - qt6_porting
     paths-ignore:
       - '**.md'
       - '**.txt'
