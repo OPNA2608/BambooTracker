@@ -26,7 +26,7 @@ env:
   SCRIPT_NAME: osx
   MAKE: make
   BT_INSTALLBASE: ${{ github.workspace }}/target/
-  QMAKE_EXTRA_ARGUMENTS: CONFIG+=install_flat CONFIG+=use_jack
+  QMAKE_EXTRA_ARGUMENTS: CONFIG+=install_flat
 
 jobs:
   build:
@@ -76,11 +76,7 @@ jobs:
         run: |
           export HOMEBREW_NO_INSTALL_CLEANUP=1
           brew update
-          # JACK implies brew link python-3.9, fails due to shipped python binaries
-          brew unlink python@3.9
-          brew link --overwrite python@3.9
-          brew upgrade --force python@3.9
-          brew install qt@5 pkg-config jack coreutils
+          brew install qt@5 pkg-config coreutils
           brew link --force qt@5
 
       ## End macOS-specific steps
