@@ -96,10 +96,10 @@ before_build:
   - ps: $env:Path = "$env:QT;$env:COMPILER;$env:Path"
   - sh: |
       ls -ahl $HOME/Qt/ || true
-      ls -ahl $HOME/Qt/6.4/ || true
-      ls -ahl $HOME/Qt/6.4/bin/ || true
+      ls -ahl $HOME/Qt/6.4/macos/ || true
+      ls -ahl $HOME/Qt/6.4/macos/bin/ || true
       find $HOME/Qt/ -name qmake || true
-      export PATH="$HOME/Qt/6.4/bin:$PATH"
+      export PATH="$HOME/Qt/6.4/macos/bin:$PATH"
 
 # to run your custom scripts instead of automatic MSBuild
 build_script:
