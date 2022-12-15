@@ -95,19 +95,7 @@ platform: x86
 before_build:
   - ps: $env:Path = "$env:QT;$env:COMPILER;$env:Path"
   - sh: |
-      # Update outdated cacerts
-      curl --insecure --remote-name https://curl.se/ca/cacert.pem
-      sudo mv cacert.pem /etc/ssl/cert.pem
-
-      export HOMEBREW_NO_INSTALL_CLEANUP=1
-      brew update
-
-      # Download failed: Homebrew-installed `curl` is not installed
-      brew install curl
-      brew install qt@5 pkg-config jack p7zip
-
-      export PATH="/usr/local/opt/qt@5/bin:$PATH"
-      export PKG_CONFIG_PATH="/usr/local/opt/jack/lib/pkgconfig"${PKG_CONFIG_PATH:+':'}$PKG_CONFIG_PATH
+      export PATH="$HOME/Qt/6.4/bin:$PATH"
 
 # to run your custom scripts instead of automatic MSBuild
 build_script:
@@ -118,7 +106,7 @@ build_script:
       Invoke-Expression ($env:MAKE + " qmake_all")
       Invoke-Expression ($env:MAKE + " -j2")
   - sh: |
-      qmake Project.pro PREFIX="$APPVEYOR_BUILD_FOLDER"/target CONFIG-=release CONFIG+=debug CONFIG+=console CONFIG+=nostrip CONFIG+=install_flat CONFIG+=use_jack
+      qmake Project.pro PREFIX="$APPVEYOR_BUILD_FOLDER"/target CONFIG-=release CONFIG+=debug CONFIG+=console CONFIG+=nostrip CONFIG+=install_flat
       $MAKE qmake_all
       $MAKE -j2
 
@@ -150,7 +138,7 @@ after_build:
       7z a -tzip "$env:DEST" BambooTracker-v"$env:APPVEYOR_BUILD_VERSION$DEV_LAB$env:PLATFORM"
   - sh: |
       mv target BambooTracker-v"$APPVEYOR_BUILD_VERSION"-dev-"$PLATFORM"
-      7z a -tzip "$DEST" BambooTracker-v"$APPVEYOR_BUILD_VERSION"-dev-"$PLATFORM"
+      zip -r "$DEST" BambooTracker-v"$APPVEYOR_BUILD_VERSION"-dev-"$PLATFORM"
 
 #---------------------------------#
 #      artifacts configuration    #
